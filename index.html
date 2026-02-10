@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K TECH | Krushna Jawale</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Custom Config & Styles -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', // Light background
+                            900: '#0f172a', // Dark text
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'spin-slow': 'spin 3s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        /* Noise Texture - Inverted opacity for light mode */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.4;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Custom Scrollbar - Light Theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Utility for hiding scrollbar in loading */
+        .overflow-hidden {
+            overflow: hidden !important;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-teal-500/30 selection:text-teal-800 overflow-hidden" id="body">
+
+    <!-- LOADING SCREEN -->
+    <div id="loader"
+        class="fixed inset-0 bg-slate-50 flex items-center justify-center z-[100] transition-opacity duration-500">
+        <div class="flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-teal-500/30 border-t-teal-600 rounded-full animate-spin mb-4"></div>
+            <div class="text-teal-600 font-mono text-sm tracking-widest animate-pulse">INITIALIZING K TECH...</div>
+        </div>
+    </div>
+
+    <!-- STARFIELD CANVAS -->
+    <canvas id="starfield" class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-60"></canvas>
+
+    <!-- NOISE OVERLAY -->
+    <div class="noise-overlay"></div>
+
+    <!-- NAVBAR -->
+    <nav id="navbar"
+        class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-transparent py-6">
+        <div class="container mx-auto px-6 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="text-2xl font-bold tracking-tighter text-slate-900 flex items-center gap-2">
+                <div class="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-white font-black">KT
+                </div>
+                <span>K TECH</span>
+            </div>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#about"
+                    class="text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors uppercase tracking-widest">About</a>
+                <a href="#skills"
+                    class="text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors uppercase tracking-widest">Skills</a>
+                <a href="#experience"
+                    class="text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors uppercase tracking-widest">Experience</a>
+                <a href="#projects"
+                    class="text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors uppercase tracking-widest">Projects</a>
+
+                <button onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})"
+                    class="magnetic-btn px-6 py-2 bg-slate-900 text-white rounded-full font-bold hover:bg-teal-600 transition-colors shadow-lg shadow-slate-200">
+                    <span>Contact Me</span>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="md:hidden text-slate-900 z-50 relative">
+                <i data-lucide="menu" id="menu-icon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MOBILE MENU OVERLAY -->
+    <div id="mobile-menu"
+        class="fixed inset-0 z-40 bg-slate-50 transition-transform duration-500 translate-x-full flex flex-col items-center justify-center gap-8 md:hidden">
+        <a href="#about"
+            class="mobile-link text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">About</a>
+        <a href="#skills"
+            class="mobile-link text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">Skills</a>
+        <a href="#experience"
+            class="mobile-link text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">Experience</a>
+        <a href="#projects"
+            class="mobile-link text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">Projects</a>
+        <a href="#contact"
+            class="mobile-link text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500">Contact</a>
+    </div>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section id="about" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+            <!-- Background Radial -->
+            <div id="hero-bg" class="absolute inset-0 z-0 opacity-40 pointer-events-none"
+                style="background: radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.1) 0%, transparent 60%);">
+            </div>
+
+            <div class="container mx-auto px-6 relative z-10 text-center">
+                <div
+                    class="inline-block mb-4 px-4 py-1.5 rounded-full border border-teal-600/20 bg-teal-50 text-teal-700 text-xs font-bold tracking-widest uppercase animate-fade-in-up">
+                    Available for Remote Work
+                </div>
+
+                <h1 class="text-5xl md:text-7xl lg:text-9xl font-black tracking-tighter text-slate-900 mb-6 leading-tight animate-fade-in-up"
+                    style="animation-delay: 0.1s;">
+                    <span
+                        class="block hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-teal-600 hover:to-purple-600 transition-all duration-500 cursor-default">KRUSHNA</span>
+                    <span
+                        class="block text-slate-400 hover:text-slate-900 transition-colors duration-500 cursor-default">JAWALE</span>
+                </h1>
+
+                <h2 class="text-xl md:text-2xl font-bold text-teal-600 mb-8 animate-fade-in-up uppercase tracking-widest"
+                    style="animation-delay: 0.15s;">
+                    Full-Stack Developer • UI/UX • Problem Solver
+                </h2>
+
+                <p class="max-w-2xl mx-auto text-lg text-slate-600 mb-8 leading-relaxed animate-fade-in-up"
+                    style="animation-delay: 0.2s;">
+                    Results-driven developer with experience in web design, full-stack development, data handling, and
+                    analytics.
+                    Proficient in JavaScript, PHP, Python, Java, and Excel.
+                </p>
+
+                <!-- Stats Row -->
+                <div class="flex flex-wrap justify-center gap-8 md:gap-16 mb-12 animate-fade-in-up"
+                    style="animation-delay: 0.25s;">
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-slate-900">3+</div>
+                        <div class="text-xs text-slate-500 uppercase tracking-widest">Years Exp</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-slate-900">20+</div>
+                        <div class="text-xs text-slate-500 uppercase tracking-widest">Projects</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-black text-slate-900">100%</div>
+                        <div class="text-xs text-slate-500 uppercase tracking-widest">Satisfaction</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row items-center justify-center gap-6 animate-fade-in-up"
+                    style="animation-delay: 0.3s;">
+                    <button onclick="document.getElementById('projects').scrollIntoView({behavior: 'smooth'})"
+                        class="magnetic-btn group relative px-8 py-4 bg-teal-500 text-white rounded-full font-bold text-lg overflow-hidden shadow-xl shadow-teal-500/20">
+                        <span class="relative z-10 group-hover:text-white transition-colors">See Projects</span>
+                        <div
+                            class="absolute inset-0 bg-slate-900 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out">
+                        </div>
+                    </button>
+
+                    <button
+                        class="magnetic-btn px-8 py-4 border border-slate-300 text-slate-700 rounded-full font-bold text-lg hover:bg-slate-100 transition-colors flex items-center gap-2">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                        <span>Download Resume</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-slate-400">
+                <i data-lucide="chevron-down" class="w-8 h-8"></i>
+            </div>
+        </section>
+
+        <!-- SKILLS SECTION -->
+        <section id="skills" class="py-32 px-6 bg-white">
+            <div class="container mx-auto">
+                <div class="flex flex-col md:flex-row gap-16">
+                    <div class="md:w-1/3">
+                        <div class="sticky top-32">
+                            <h2 class="text-5xl font-bold text-slate-900 mb-6">Skills & Expertise</h2>
+                            <p class="text-slate-600 text-lg mb-8">
+                                I build dependable web applications and polished front-ends. My focus is on readable
+                                code, fast performance and clear UX.
+                            </p>
+                            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                                <h4 class="text-slate-900 font-bold mb-2">Hire me for</h4>
+                                <p class="text-sm text-slate-500">Web apps, dashboards, CMS, integrations, automation
+                                    and freelance product builds. I deliver production-ready code.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:w-2/3 grid grid-cols-1 gap-6">
+                        <!-- Frontend -->
+                        <div
+                            class="glowing-card p-8 bg-white border border-slate-200 rounded-3xl relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+                            <div
+                                class="glow-effect pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100">
+                            </div>
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <div class="p-3 bg-teal-50 rounded-lg text-teal-600"><i data-lucide="layout"
+                                            class="w-6 h-6"></i></div>
+                                    <h3 class="text-2xl font-bold text-slate-900">Frontend Development</h3>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1"><span class="text-slate-500">HTML
+                                                / Tailwind CSS</span><span class="text-teal-600">95%</span></div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-teal-500 w-[95%]"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1"><span
+                                                class="text-slate-500">JavaScript (ES6+)</span><span
+                                                class="text-teal-600">85%</span></div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-teal-500 w-[85%]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Backend -->
+                        <div
+                            class="glowing-card p-8 bg-white border border-slate-200 rounded-3xl relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+                            <div
+                                class="glow-effect pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100">
+                            </div>
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <div class="p-3 bg-purple-50 rounded-lg text-purple-600"><i data-lucide="server"
+                                            class="w-6 h-6"></i></div>
+                                    <h3 class="text-2xl font-bold text-slate-900">Backend Engineering</h3>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-4">
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1"><span
+                                                    class="text-slate-500">PHP</span><span
+                                                    class="text-purple-600">90%</span></div>
+                                            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-purple-500 w-[90%]"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1"><span
+                                                    class="text-slate-500">Node / Express</span><span
+                                                    class="text-purple-600">70%</span></div>
+                                            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-purple-500 w-[70%]"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1"><span
+                                                    class="text-slate-500">Python</span><span
+                                                    class="text-purple-600">75%</span></div>
+                                            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-purple-500 w-[75%]"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1"><span
+                                                    class="text-slate-500">Java</span><span
+                                                    class="text-purple-600">70%</span></div>
+                                            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-purple-500 w-[70%]"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data & Tools -->
+                        <div
+                            class="glowing-card p-8 bg-white border border-slate-200 rounded-3xl relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+                            <div
+                                class="glow-effect pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100">
+                            </div>
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <div class="p-3 bg-blue-50 rounded-lg text-blue-600"><i data-lucide="database"
+                                            class="w-6 h-6"></i></div>
+                                    <h3 class="text-2xl font-bold text-slate-900">Data & Analytics</h3>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1"><span
+                                                class="text-slate-500">Databases (SQL / NoSQL)</span><span
+                                                class="text-blue-600">85%</span></div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-500 w-[85%]"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1"><span
+                                                class="text-slate-500">Excel & Data Analytics</span><span
+                                                class="text-blue-600">80%</span></div>
+                                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-500 w-[80%]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXPERIENCE SECTION -->
+        <section id="experience" class="py-32 px-6 relative bg-slate-50">
+            <div class="container mx-auto">
+                <div class="mb-20">
+                    <h2 class="text-5xl md:text-7xl font-bold text-slate-900 mb-6">Experience</h2>
+                    <div class="h-1 w-20 bg-teal-500 rounded-full"></div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Job 1 -->
+                    <div
+                        class="glowing-card p-8 bg-white border border-slate-200 rounded-3xl relative overflow-hidden shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-slate-900">Frontend Developer</h3>
+                                <p class="text-teal-600 font-medium">K Tech • Lonavala</p>
+                            </div>
+                            <span class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full">Jun 2020
+                                — Present</span>
+                        </div>
+                        <ul class="space-y-2 text-slate-600 list-disc list-inside">
+                            <li>Developed responsive UI components using Tailwind CSS and vanilla JavaScript.</li>
+                            <li>Integrated PHP backends and boosted page speed by 40%.</li>
+                            <li>Collaborated with backend teams on API design and data integration.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Job 2 -->
+                    <div
+                        class="glowing-card p-8 bg-white border border-slate-200 rounded-3xl relative overflow-hidden shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-slate-900">Web Developer (Freelance)</h3>
+                                <p class="text-teal-600 font-medium">Remote</p>
+                            </div>
+                            <span class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full">2021 —
+                                Present</span>
+                        </div>
+                        <ul class="space-y-2 text-slate-600 list-disc list-inside">
+                            <li>Delivered 10+ websites and dashboards for small businesses.</li>
+                            <li>Created full-stack solutions using JavaScript, PHP, and Python.</li>
+                            <li>Built reusable UI components and custom CMS features.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Job 3 -->
+                    <div
+                        class="glowing-card p-8 bg-white border border-slate-200 rounded-3xl relative overflow-hidden shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-slate-900">AI & ML Projects</h3>
+                                <p class="text-teal-600 font-medium">Remote</p>
+                            </div>
+                            <span class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full">2022 —
+                                Present</span>
+                        </div>
+                        <ul class="space-y-2 text-slate-600 list-disc list-inside">
+                            <li>Built ML models using Python (scikit-learn, TensorFlow) for classification.</li>
+                            <li>Trained custom models with real-world datasets for sales forecasting.</li>
+                            <li>Implemented evaluation metrics like cross-validation and confusion matrices.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Job 4 -->
+                    <div
+                        class="glowing-card p-8 bg-white border border-slate-200 rounded-3xl relative overflow-hidden shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-slate-900">Data Analytics & Automation</h3>
+                                <p class="text-teal-600 font-medium">Remote</p>
+                            </div>
+                            <span class="text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1 rounded-full">2022 —
+                                Present</span>
+                        </div>
+                        <ul class="space-y-2 text-slate-600 list-disc list-inside">
+                            <li>Analyzed structured/unstructured data using Excel, SQL, and Python.</li>
+                            <li>Automated report generation and data cleaning workflows.</li>
+                            <li>Visualized trends with dashboards using Excel and web tools.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Education & Certs -->
+                <div class="mt-16">
+                    <h3 class="text-3xl font-bold text-slate-900 mb-8">Education & Certifications</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="p-6 border-l-2 border-teal-500 pl-6">
+                            <h4 class="text-xl font-bold text-slate-900">Sinhgad Institute of Technology (SIT)</h4>
+                            <p class="text-slate-600">Engineering • Computer Engineering</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span
+                                class="px-3 py-1 bg-white shadow-sm text-xs text-slate-600 rounded-md border border-slate-200">Responsive
+                                Web Design (FreeCodeCamp)</span>
+                            <span
+                                class="px-3 py-1 bg-white shadow-sm text-xs text-slate-600 rounded-md border border-slate-200">JS
+                                Algos & DS (FreeCodeCamp)</span>
+                            <span
+                                class="px-3 py-1 bg-white shadow-sm text-xs text-slate-600 rounded-md border border-slate-200">Python
+                                for Everybody (UMich)</span>
+                            <span
+                                class="px-3 py-1 bg-white shadow-sm text-xs text-slate-600 rounded-md border border-slate-200">Data
+                                Science (Berkeley)</span>
+                            <span
+                                class="px-3 py-1 bg-white shadow-sm text-xs text-slate-600 rounded-md border border-slate-200">ML
+                                with Python (IBM)</span>
+                            <span
+                                class="px-3 py-1 bg-white shadow-sm text-xs text-slate-600 rounded-md border border-slate-200">Meta
+                                Front-End Developer</span>
+                            <span
+                                class="px-3 py-1 bg-white shadow-sm text-xs text-slate-600 rounded-md border border-slate-200">Google
+                                Data Analytics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROJECTS SECTION -->
+        <section id="projects" class="py-32 px-6 bg-white">
+            <div class="container mx-auto">
+                <div class="mb-20">
+                    <h2 class="text-5xl md:text-7xl font-bold text-slate-900 mb-6">Selected Projects</h2>
+                    <div class="h-1 w-20 bg-teal-500 rounded-full"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                    <!-- Project 1: K Series -->
+                    <div
+                        class="glowing-card relative overflow-hidden rounded-3xl bg-white border border-slate-200 group hover:border-teal-500/50 transition-colors duration-500 h-[450px] flex flex-col cursor-pointer shadow-sm hover:shadow-lg">
+                        <div
+                            class="glow-effect pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100">
+                        </div>
+                        <div class="h-48 overflow-hidden relative bg-slate-100">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-red-500 to-pink-600 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
+                            </div>
+                            <div
+                                class="w-full h-full flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform duration-700">
+                                <i data-lucide="play-circle" class="w-16 h-16"></i></div>
+                        </div>
+                        <div class="p-8 flex-1 flex flex-col justify-between relative z-10">
+                            <div>
+                                <div class="text-xs font-bold tracking-widest text-teal-600 uppercase mb-2">Media CMS
+                                </div>
+                                <h3
+                                    class="text-2xl font-bold text-slate-900 mb-2 group-hover:translate-x-2 transition-transform duration-300">
+                                    K Series</h3>
+                                <p class="text-slate-600 text-sm mb-4">Content management system for organizing and
+                                    streaming series & movies.</p>
+                            </div>
+                            <div class="flex gap-2 text-xs font-mono text-slate-400">
+                                <span>PHP</span>•<span>Tailwind</span>•<span>JS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 2: K Dairy -->
+                    <div
+                        class="glowing-card relative overflow-hidden rounded-3xl bg-white border border-slate-200 group hover:border-teal-500/50 transition-colors duration-500 h-[450px] flex flex-col cursor-pointer shadow-sm hover:shadow-lg">
+                        <div
+                            class="glow-effect pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100">
+                        </div>
+                        <div class="h-48 overflow-hidden relative bg-slate-100">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
+                            </div>
+                            <div
+                                class="w-full h-full flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform duration-700">
+                                <i data-lucide="milk" class="w-16 h-16"></i></div>
+                        </div>
+                        <div class="p-8 flex-1 flex flex-col justify-between relative z-10">
+                            <div>
+                                <div class="text-xs font-bold tracking-widest text-teal-600 uppercase mb-2">Management
+                                    System</div>
+                                <h3
+                                    class="text-2xl font-bold text-slate-900 mb-2 group-hover:translate-x-2 transition-transform duration-300">
+                                    K Dairy</h3>
+                                <p class="text-slate-600 text-sm mb-4">Lightweight system for dairy owners to manage
+                                    daily entries and farmer records.</p>
+                            </div>
+                            <div class="flex gap-2 text-xs font-mono text-slate-400">
+                                <span>PHP</span>•<span>Tailwind</span>•<span>JS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 3: K Talk -->
+                    <div
+                        class="glowing-card relative overflow-hidden rounded-3xl bg-white border border-slate-200 group hover:border-teal-500/50 transition-colors duration-500 h-[450px] flex flex-col cursor-pointer shadow-sm hover:shadow-lg">
+                        <div
+                            class="glow-effect pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100">
+                        </div>
+                        <div class="h-48 overflow-hidden relative bg-slate-100">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-500 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
+                            </div>
+                            <div
+                                class="w-full h-full flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform duration-700">
+                                <i data-lucide="message-circle" class="w-16 h-16"></i></div>
+                        </div>
+                        <div class="p-8 flex-1 flex flex-col justify-between relative z-10">
+                            <div>
+                                <div class="text-xs font-bold tracking-widest text-teal-600 uppercase mb-2">Chat System
+                                </div>
+                                <h3
+                                    class="text-2xl font-bold text-slate-900 mb-2 group-hover:translate-x-2 transition-transform duration-300">
+                                    K Talk</h3>
+                                <p class="text-slate-600 text-sm mb-4">Real-time chat system with lightweight
+                                    architecture for communities and teams.</p>
+                            </div>
+                            <div class="flex gap-2 text-xs font-mono text-slate-400">
+                                <span>PHP</span>•<span>Tailwind</span>•<span>JS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 4: Krushna's Kitchen -->
+                    <div
+                        class="glowing-card relative overflow-hidden rounded-3xl bg-white border border-slate-200 group hover:border-teal-500/50 transition-colors duration-500 h-[450px] flex flex-col cursor-pointer shadow-sm hover:shadow-lg">
+                        <div
+                            class="glow-effect pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100">
+                        </div>
+                        <div class="h-48 overflow-hidden relative bg-slate-100">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-orange-500 to-amber-500 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
+                            </div>
+                            <div
+                                class="w-full h-full flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform duration-700">
+                                <i data-lucide="utensils" class="w-16 h-16"></i></div>
+                        </div>
+                        <div class="p-8 flex-1 flex flex-col justify-between relative z-10">
+                            <div>
+                                <div class="text-xs font-bold tracking-widest text-teal-600 uppercase mb-2">Restaurant
+                                    Management</div>
+                                <h3
+                                    class="text-2xl font-bold text-slate-900 mb-2 group-hover:translate-x-2 transition-transform duration-300">
+                                    Krushna’s Kitchen</h3>
+                                <p class="text-slate-600 text-sm mb-4">Full restaurant management system with orders,
+                                    inventory, and staff management.</p>
+                            </div>
+                            <div class="flex gap-2 text-xs font-mono text-slate-400">
+                                <span>PHP</span>•<span>MySQL</span>•<span>JS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 5: K Libra -->
+                    <div
+                        class="glowing-card relative overflow-hidden rounded-3xl bg-white border border-slate-200 group hover:border-teal-500/50 transition-colors duration-500 h-[450px] flex flex-col cursor-pointer shadow-sm hover:shadow-lg">
+                        <div
+                            class="glow-effect pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100">
+                        </div>
+                        <div class="h-48 overflow-hidden relative bg-slate-100">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-indigo-500 to-violet-500 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
+                            </div>
+                            <div
+                                class="w-full h-full flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform duration-700">
+                                <i data-lucide="book-open" class="w-16 h-16"></i></div>
+                        </div>
+                        <div class="p-8 flex-1 flex flex-col justify-between relative z-10">
+                            <div>
+                                <div class="text-xs font-bold tracking-widest text-teal-600 uppercase mb-2">Library
+                                    System</div>
+                                <h3
+                                    class="text-2xl font-bold text-slate-900 mb-2 group-hover:translate-x-2 transition-transform duration-300">
+                                    K Libra</h3>
+                                <p class="text-slate-600 text-sm mb-4">System to manage book inventory, issue tracking,
+                                    student accounts, and due dates.</p>
+                            </div>
+                            <div class="flex gap-2 text-xs font-mono text-slate-400">
+                                <span>PHP</span>•<span>MySQL</span>•<span>JS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 6: College Talk -->
+                    <div
+                        class="glowing-card relative overflow-hidden rounded-3xl bg-white border border-slate-200 group hover:border-teal-500/50 transition-colors duration-500 h-[450px] flex flex-col cursor-pointer shadow-sm hover:shadow-lg">
+                        <div
+                            class="glow-effect pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100">
+                        </div>
+                        <div class="h-48 overflow-hidden relative bg-slate-100">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-pink-500 to-rose-500 opacity-10 group-hover:opacity-20 transition-opacity duration-500">
+                            </div>
+                            <div
+                                class="w-full h-full flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform duration-700">
+                                <i data-lucide="users" class="w-16 h-16"></i></div>
+                        </div>
+                        <div class="p-8 flex-1 flex flex-col justify-between relative z-10">
+                            <div>
+                                <div class="text-xs font-bold tracking-widest text-teal-600 uppercase mb-2">Student
+                                    Platform</div>
+                                <h3
+                                    class="text-2xl font-bold text-slate-900 mb-2 group-hover:translate-x-2 transition-transform duration-300">
+                                    College Talk</h3>
+                                <p class="text-slate-600 text-sm mb-4">Platform for students to share notes, access
+                                    study materials, and collaborate.</p>
+                            </div>
+                            <div class="flex gap-2 text-xs font-mono text-slate-400">
+                                <span>PHP</span>•<span>HTML/CSS</span>•<span>JS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact" class="py-32 px-6 relative overflow-hidden bg-slate-50">
+            <div class="absolute inset-0 bg-gradient-to-t from-teal-500/10 to-transparent pointer-events-none"></div>
+
+            <div class="container mx-auto max-w-4xl text-center relative z-10">
+                <h2 class="text-6xl md:text-8xl font-black text-slate-900 mb-12 tracking-tighter">
+                    READY TO <br />
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">COLLABORATE?</span>
+                </h2>
+
+                <p class="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
+                    Based in Lonavala, Maharashtra • Available for remote work.<br>
+                    Interested in hiring? Send a quick message or email me directly.
+                </p>
+
+                <div class="flex flex-col items-center gap-6">
+                    <button onclick="location.href='mailto:krushnajawale2522006@gmail.com'"
+                        class="magnetic-btn inline-flex items-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-full font-bold text-lg md:text-xl hover:bg-teal-600 transition-colors shadow-xl shadow-slate-300 break-all">
+                        <i data-lucide="mail" class="w-6 h-6 flex-shrink-0"></i>
+                        <span>krushnajawale2522006@gmail.com</span>
+                    </button>
+
+                    <p class="text-slate-500 text-sm">Lonavala, Maharashtra, India</p>
+                </div>
+
+                <div class="mt-24 flex justify-center gap-8">
+                    <a href="#"
+                        class="p-4 rounded-full bg-slate-200 text-slate-600 hover:text-white hover:bg-slate-900 transition-all">
+                        <i data-lucide="github" class="w-6 h-6"></i>
+                    </a>
+                    <a href="#"
+                        class="p-4 rounded-full bg-slate-200 text-slate-600 hover:text-white hover:bg-slate-900 transition-all">
+                        <i data-lucide="linkedin" class="w-6 h-6"></i>
+                    </a>
+                    <a href="#"
+                        class="p-4 rounded-full bg-slate-200 text-slate-600 hover:text-white hover:bg-slate-900 transition-all">
+                        <i data-lucide="twitter" class="w-6 h-6"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-8 border-t border-slate-200 bg-slate-50 text-center relative z-10">
+        <p class="text-slate-500 text-sm">
+            © K Tech 2025. Designed & built by <span class="text-teal-600">Krushna Jawale</span>.
+        </p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 0. INIT ICONS
+            lucide.createIcons();
+
+            // 1. LOADING SCREEN
+            const loader = document.getElementById('loader');
+            const body = document.getElementById('body');
+
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    body.classList.remove('overflow-hidden');
+                }, 500);
+            }, 2000);
+
+            // 2. STARFIELD BACKGROUND
+            const canvas = document.getElementById('starfield');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+            let mouse = { x: null, y: null };
+
+            const CONNECTION_DISTANCE = 150;
+            const MOUSE_DISTANCE = 200;
+
+            // Adjust particle count based on screen size
+            const getParticleCount = () => window.innerWidth < 768 ? 40 : 80;
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.size = Math.random() * 1.5 + 0.5;
+                    this.baseColor = 'rgba(13, 148, 136, '; // Teal-600 base for light mode
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Bounce
+                    if (this.x < 0 || this.x > width) this.vx *= -1;
+                    if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                    // Mouse Interaction
+                    if (mouse.x != null) {
+                        const dx = mouse.x - this.x;
+                        const dy = mouse.y - this.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < MOUSE_DISTANCE) {
+                            const forceDirectionX = dx / distance;
+                            const forceDirectionY = dy / distance;
+                            const force = (MOUSE_DISTANCE - distance) / MOUSE_DISTANCE;
+                            const directionX = forceDirectionX * force * this.size;
+                            const directionY = forceDirectionY * force * this.size;
+
+                            this.x -= directionX;
+                            this.y -= directionY;
+                        }
+                    }
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.baseColor + '0.8)';
+                    ctx.fill();
+                }
+            }
+
+            function initCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                particles = [];
+                const count = getParticleCount();
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animateCanvas() {
+                ctx.clearRect(0, 0, width, height);
+
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+
+                    // Draw connections
+                    particles.forEach(otherParticle => {
+                        const dx = particle.x - otherParticle.x;
+                        const dy = particle.y - otherParticle.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < CONNECTION_DISTANCE) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(13, 148, 136, ${1 - distance / CONNECTION_DISTANCE})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(particle.x, particle.y);
+                            ctx.lineTo(otherParticle.x, otherParticle.y);
+                            ctx.stroke();
+                        }
+                    });
+                });
+                requestAnimationFrame(animateCanvas);
+            }
+
+            // Canvas Listeners
+            window.addEventListener('resize', initCanvas);
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY; // Canvas is fixed, so clientY is correct
+            });
+
+            initCanvas();
+            animateCanvas();
+
+
+            // 3. MAGNETIC BUTTONS
+            const magneticBtns = document.querySelectorAll('.magnetic-btn');
+
+            magneticBtns.forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - (rect.left + rect.width / 2);
+                    const y = e.clientY - (rect.top + rect.height / 2);
+
+                    // Move button slightly towards cursor
+                    btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+                });
+
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translate(0, 0)';
+                });
+            });
+
+
+            // 4. GLOWING CARDS
+            const cards = document.querySelectorAll('.glowing-card');
+
+            cards.forEach(card => {
+                const glow = card.querySelector('.glow-effect');
+
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    // Adjusted glow color for light mode (teal shadow)
+                    glow.style.background = `radial-gradient(600px circle at ${x}px ${y}px, rgba(20, 184, 166, 0.15), transparent 40%)`;
+                });
+            });
+
+
+            // 5. NAVBAR SCROLL EFFECT
+            const navbar = document.getElementById('navbar');
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('bg-white/80', 'backdrop-blur-xl', 'border-slate-200', 'py-4', 'shadow-sm');
+                    navbar.classList.remove('bg-transparent', 'border-transparent', 'py-6');
+                } else {
+                    navbar.classList.remove('bg-white/80', 'backdrop-blur-xl', 'border-slate-200', 'py-4', 'shadow-sm');
+                    navbar.classList.add('bg-transparent', 'border-transparent', 'py-6');
+                }
+            });
+
+
+            // 6. HERO PARALLAX
+            const heroBg = document.getElementById('hero-bg');
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                if (scrollY < window.innerHeight) {
+                    heroBg.style.transform = `translateY(${scrollY * 0.5}px)`;
+                }
+            });
+
+
+            // 7. MOBILE MENU
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const menuIcon = document.getElementById('menu-icon');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            let isMenuOpen = false;
+
+            menuBtn.addEventListener('click', () => {
+                isMenuOpen = !isMenuOpen;
+                if (isMenuOpen) {
+                    mobileMenu.classList.remove('translate-x-full');
+                    mobileMenu.classList.add('translate-x-0');
+                    menuIcon.setAttribute('data-lucide', 'x');
+                } else {
+                    mobileMenu.classList.add('translate-x-full');
+                    mobileMenu.classList.remove('translate-x-0');
+                    menuIcon.setAttribute('data-lucide', 'menu');
+                }
+                lucide.createIcons(); // Refresh icon
+            });
+
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    isMenuOpen = false;
+                    mobileMenu.classList.add('translate-x-full');
+                    mobileMenu.classList.remove('translate-x-0');
+                    menuIcon.setAttribute('data-lucide', 'menu');
+                    lucide.createIcons();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
