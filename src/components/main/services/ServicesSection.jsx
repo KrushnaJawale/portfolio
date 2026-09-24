@@ -16,6 +16,7 @@ import {
   GitBranch,
   Bot
 } from "lucide-react";
+import { useState } from "react";
 
 const services = [
   { id: 1, title: "Frontend Dev", icon: Code2 },
@@ -36,29 +37,88 @@ const services = [
   { id: 16, title: "AI Chatbots", icon: Bot },
 ];
 
+// Split services into two rows
+const row1 = services.slice(0, 8);
+const row2 = services.slice(8, 16);
+
+// Duplicate for infinite scroll
+const row1Extended = [...row1, ...row1, ...row1];
+const row2Extended = [...row2, ...row2, ...row2];
+
+const ServiceCard = ({ service }) => {
+  const Icon = service.icon;
+  return (
+    <div className="flex items-center gap-2.5 bg-[#f3f4f6] text-gray-800 text-sm font-medium px-4 py-3 rounded-xl whitespace-nowrap flex-shrink-0 hover:bg-gray-300 transition-colors">
+      <Icon className="w-4 h-4 text-purple-600" />
+      <span>{service.title}</span>
+    </div>
+  );
+};
+
 export default function ServicesSection() {
+  const [isHovering, setIsHovering] = useState(false);
+
   return (
     <section id="services" className="bg-gray-50 py-16 px-6 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* Header - Exactly matches Projects header alignment */}
-        <div className="mb-8 text-center md:text-left">
+        {/* Header */}
+        <div className="mb-12 text-center md:text-left">
           <h2 className="text-3xl font-bold text-gray-900">Services</h2>
         </div>
 
-        {/* Services Pills */}
-        <div className="flex flex-wrap gap-3">
-          {services.map((service) => {
-            const Icon = service.icon;
-            return (
-              <div
-                key={service.id}
-                className="flex items-center gap-2.5 bg-[#f3f4f6] hover:bg-gray-200 text-gray-800 text-sm font-medium px-4 py-3 rounded-xl transition-colors cursor-pointer"
-              >
-                <Icon className="w-4 h-4 text-purple-600" />
-                <span>{service.title}</span>
-              </div>
-            );
-          })}
+        <style>{`
+          @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-33.333%); }
+          }
+
+          @keyframes scroll-right {
+            0% { transform: translateX(-33.333%); }
+            100% { transform: translateX(0); }
+          }
+
+          .scroll-left {
+            animation: scroll-left 20s linear infinite;
+          }
+
+          .scroll-right {
+            animation: scroll-right 20s linear infinite;
+          }
+
+          .scroll-left.paused,
+          .scroll-right.paused {
+            animation-play-state: paused;
+          }
+        `}</style>
+
+        {/* Row 1 - Left to Right */}
+        <div 
+          className="mb-6 overflow-hidden relative"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+          onTouchStart={() => setIsHovering(true)}
+          onTouchEnd={() => setIsHovering(false)}
+        >
+          <div className={`flex gap-4 ${isHovering ? 'scroll-left paused' : 'scroll-left'}`}>
+            {row1Extended.map((service, idx) => (
+              <ServiceCard key={`row1-${idx}`} service={service} />
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2 - Right to Left */}
+        <div 
+          className="overflow-hidden relative"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+          onTouchStart={() => setIsHovering(true)}
+          onTouchEnd={() => setIsHovering(false)}
+        >
+          <div className={`flex gap-4 ${isHovering ? 'scroll-right paused' : 'scroll-right'}`}>
+            {row2Extended.map((service, idx) => (
+              <ServiceCard key={`row2-${idx}`} service={service} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

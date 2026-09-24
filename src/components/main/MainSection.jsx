@@ -3,12 +3,14 @@ import ServicesSection from './services/ServicesSection';
 import ProjectsSection from './projects/ProjectsSection';
 import ContactSection from './contact/ContactSection';
 import CertificatesSection from './certificates/CertificatesSection';
+import EducationSection from './education/EducationSection';
 
 export default function MainSection() {
   return (
     <main>
       <AboutSection />
       <ServicesSection />
+        <EducationSection />
       <div className="flex flex-col xl:flex-row w-full overflow-hidden">
         <div className="w-full xl:w-1/2">
           <ProjectsSection />
