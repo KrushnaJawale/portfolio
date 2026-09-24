@@ -9,13 +9,21 @@ export default function MainSection() {
   return (
     <main>
       <AboutSection />
-      <ServicesSection />
-        <EducationSection />
+      <div className="flex flex-col xl:flex-row w-full overflow-hidden">
+        <div className="w-full xl:w-1/2">
+          <ServicesSection />
+        </div>
+        <div className="w-full xl:w-1/2">
+         <EducationSection />
+        </div>
+      </div>
+      
+      
       <div className="flex flex-col xl:flex-row w-full overflow-hidden">
         <div className="w-full xl:w-1/2">
           <ProjectsSection />
         </div>
-        <div className="w-full xl:w-1/2 border-t xl:border-t-0 xl:border-l border-gray-100">
+        <div className="w-full xl:w-1/2 ">
           <CertificatesSection />
         </div>
       </div>

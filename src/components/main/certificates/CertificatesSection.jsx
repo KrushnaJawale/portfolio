@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 const certificates = [
     {
@@ -170,56 +170,19 @@ export default function CertificatesSection() {
     const nextCert = certificates[nextIndex];
 
     return (
-        <section id="certificates" className="bg-white py-20 px-6 font-sans min-h-screen h-full flex flex-col justify-start">
+        <section id="certificates" className="bg-white py-16 px-6 font-sans min-h-screen h-full flex flex-col justify-start">
             <div className="max-w-7xl mx-auto flex flex-col gap-12 items-center justify-start w-full">
-                
+
                 {/* Header (Top) */}
                 <div className="w-full text-center pt-8">
                     <h2 className="text-3xl font-bold text-gray-900">Certifications & Credentials</h2>
                     <p className="text-gray-500 text-sm mt-2">
                         Verified certifications and professional accreditations earned over the years.
                     </p>
-
-                    {/* Dots Indicator */}
-                    <div className="flex flex-wrap justify-center gap-2 mt-8">
-                        {certificates.map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => {
-                                    setCurrentIndex(index);
-                                    pauseAutoPlay();
-                                }}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                        ? 'bg-blue-600 w-8'
-                                        : 'bg-gray-300 hover:bg-gray-400'
-                                    }`}
-                                aria-label={`Go to certificate ${index + 1}`}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Auto-play status indicator */}
-                    <div className="text-center mt-6 text-sm text-gray-500">
-                        {isAutoPlay ? (
-                            <p>click arrows to pause for 10s</p>
-                        ) : (
-                            <p>Auto-play resumes in {timeLeft}s</p>
-                        )}
-                    </div>
                 </div>
 
-                {/* Vertical Slider (Bottom) */}
+                {/* Horizontal Slider (Bottom) */}
                 <div className="w-full relative flex flex-col items-center justify-center gap-4">
-                    {/* Top Arrow */}
-                    <button
-                        onClick={handlePrev}
-                        className="flex-shrink-0 p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 z-30"
-                        aria-label="Previous certificate"
-                    >
-                        <ChevronUp size={24} />
-                    </button>
-
-
 
                     {/* Center Main Card (Big) */}
                     <div className="flex-shrink-0 w-full sm:w-96">
@@ -245,16 +208,56 @@ export default function CertificatesSection() {
                         </div>
                     </div>
 
+                    {/* Unified Controls Row */}
+                    <div className="flex items-center justify-center gap-4 mt-8 w-full max-w-md mx-auto">
+
+                        {/* Left Arrow */}
+                        <button
+                            onClick={handlePrev}
+                            className="flex-shrink-0 p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 z-30"
+                            aria-label="Previous certificate"
+                        >
+                            <ChevronLeft size={24} />
+                        </button>
+
+                        {/* Dots Indicator (Scrolls horizontally on X-Axis) */}
+                        <div className="overflow-hidden max-w-[160px] py-2">
+                            <style>{`
+            .no-scrollbar::-webkit-scrollbar { display: none; }
+            .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
+                            <div
+                                className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth"
+                            >
+                                {certificates.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => {
+                                            setCurrentIndex(index);
+                                            pauseAutoPlay();
+                                        }}
+                                        className={`h-2 rounded-full transition-all duration-300 flex-shrink-0 ${index === currentIndex
+                                                ? 'bg-blue-600 w-8'
+                                                : 'bg-gray-300 hover:bg-gray-400 w-2'
+                                            }`}
+                                        aria-label={`Go to certificate ${index + 1}`}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Right Arrow */}
+                        <button
+                            onClick={handleNext}
+                            className="flex-shrink-0 p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 z-30"
+                            aria-label="Next certificate"
+                        >
+                            <ChevronRight size={24} />
+                        </button>
+
+                    </div>
 
 
-                    {/* Bottom Arrow */}
-                    <button
-                        onClick={handleNext}
-                        className="flex-shrink-0 p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 z-30"
-                        aria-label="Next certificate"
-                    >
-                        <ChevronDown size={24} />
-                    </button>
                 </div>
             </div>
         </section>

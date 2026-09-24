@@ -63,7 +63,7 @@ export default function Navbar() {
 
             {/* Navigation Links */}
             <nav className="mt-8 flex flex-col gap-3">
-              {["Home", "About", "Services", "Projects", "Certificates", "Contact"].map((item) => (
+              {["Home", "About", "Education", "Services", "Projects", "Certificates", "Contact"].map((item) => (
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
