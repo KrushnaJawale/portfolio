@@ -99,6 +99,13 @@ const certificates = [
         issuer: "UniAthena",
         year: "2026",
         image: "/certificates/uniathena-basics-of-python-01-march-2026.jpg"
+    },
+    {
+        id: 15,
+        title: "DSA with Python",
+        issuer: "Tutedude",
+        year: "2026",
+        image: "/certificates/tutedude-dsa-with-python-01-october-2026.jpg"
     }
 ];
 
