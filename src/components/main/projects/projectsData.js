@@ -68,7 +68,7 @@ const projects = [
   {
     id: 11,
     title: "CineSync2",
-    image: "/projects/cinecync2.png",
+    image: "/projects/cinesync2.png",
     url: "https://cinesync2.vercel.app"
   }
 ];
