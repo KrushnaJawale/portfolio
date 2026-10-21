@@ -30,43 +30,43 @@ const projects = [
     url: "https://qroll.kesug.com"
   },
   {
-    id: 5,
+    id: 6,
     title: "UMDDS",
     image: "/projects/umdds.png",
     url: "https://umdds.vercel.app"
   },
   {
-    id: 6,
+    id: 7,
     title: "Kisan Mitra",
     image: "/projects/kisanmitra.png",
     url: "https://ekisanmitra.vercel.app/"
   },
   {
-    id: 7,
+    id: 8,
     title: "College Talk (PHP)",
     image: "/projects/college_talk_php_version.png",
     url: "https://collegetalk.free.nf"
   },
   {
-    id: 8,
+    id: 9,
     title: "College Talk (Flask)",
     image: "/projects/college_talk_flask_version.png",
     url: "https://collegetalk.vercel.app"
   },
   {
-    id: 9,
+    id: 10,
     title: "Kam Recorder",
     image: "/projects/kam_recorder.png",
     url: "https://github.com/KrushnaJawale/kamrecorder"
   },
   {
-    id: 10,
+    id: 11,
     title: "ERA Makhana",
     image: "/projects/era_makhana.png",
     url: "https://era-makhana.com/"
   },
   {
-    id: 11,
+    id: 12,
     title: "CineSync2",
     image: "/projects/cinesync2.png",
     url: "https://cinesync2.vercel.app"
