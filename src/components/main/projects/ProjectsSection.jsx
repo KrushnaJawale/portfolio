@@ -24,7 +24,7 @@ export default function ProjectsSection() {
                         {/* Image Container */}
                         <div className="relative aspect-video overflow-hidden rounded-xl bg-gray-50 border border-gray-100 mb-4">
                             <img
-                                src="public/project_section.png"
+                                src="/project_section.png"
                                 alt="Projects preview"
                                 className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                             />
