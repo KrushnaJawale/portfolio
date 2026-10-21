@@ -12,7 +12,7 @@ export default function Navbar() {
 
           {/* Logo with Solid White Background Container & Black Text */}
           <a
-            href="#home"
+            href="/#home"
             className="px-4 py-1.5 rounded-xl bg-white text-black font-bold tracking-tight text-lg shadow-sm hover:bg-gray-100 transition-colors inline-flex items-center"
           >
             K TECH
@@ -66,19 +66,34 @@ export default function Navbar() {
               {["Home", "About", "Education", "Services", "Projects", "Certificates", "Contact"].map((item) => (
                 <a
                   key={item}
-                  href={`#${item.toLowerCase()}`}
+                  href={`/#${item.toLowerCase()}`}
                   onClick={() => setIsOpen(false)}
                   className="px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 border border-transparent hover:border-white/10 transition-all font-medium text-sm"
                 >
                   {item}
                 </a>
               ))}
+              <div className="my-2 border-t border-white/10" />
+              <a
+                href="/projects"
+                onClick={() => setIsOpen(false)}
+                className="px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 border border-transparent hover:border-white/10 transition-all font-medium text-sm"
+              >
+                Browse all projects
+              </a>
+              <a
+                href="/certificates"
+                onClick={() => setIsOpen(false)}
+                className="px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/10 border border-transparent hover:border-white/10 transition-all font-medium text-sm"
+              >
+                Browse all certificates
+              </a>
             </nav>
           </div>
 
           {/* Sidebar Footer */}
           <div className="pt-6 border-t border-white/10">
-            <a href="#contact" className="w-full text-center block bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-3 rounded-xl shadow-lg shadow-blue-600/20 transition-all cursor-pointer">
+            <a href="/#contact" className="w-full text-center block bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-3 rounded-xl shadow-lg shadow-blue-600/20 transition-all cursor-pointer">
               Let's Talk
             </a>
           </div>
